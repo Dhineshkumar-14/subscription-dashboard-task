@@ -1,6 +1,8 @@
-import pool from "../config/db.js";
 import bcryptjs from "bcryptjs";
-import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
+import pool from "../config/db.js";
+import {
+  generateToken
+} from "../utils/generateTokenAndSetCookie.js";
 
 export const register = async (req, res) => {
   try {
@@ -39,7 +41,7 @@ export const register = async (req, res) => {
 
     const user = result.rows[0];
 
-    const token = generateTokenAndSetCookie(user);
+    const token = generateToken(user);
 
     return res.status(201).json({
       success: true,
@@ -90,7 +92,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const token = generateTokenAndSetCookie(user);
+    const token = generateToken(user);
 
     return res.status(200).json({
       success: true,
