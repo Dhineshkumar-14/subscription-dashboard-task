@@ -2,12 +2,18 @@ import dotenv from "dotenv";
 import express from "express";
 import { initDb } from "./src/config/initDb.js";
 import authRoutes from "./src/routes/auth.routes.js";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
