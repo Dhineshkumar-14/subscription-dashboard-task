@@ -9,6 +9,8 @@ import authRoutes from "./src/routes/auth.routes.js";
 import planRoutes from "./src/routes/plan.routes.js";
 import subscriptionRoutes from "./src/routes/subscription.routes.js";
 import adminRoutes from "./src/routes/admin.routes.js";
+import { seedSubscriptions } from "./src/seeds/seed.subscriptions.js";
+import { seedUsers } from "./src/seeds/seed.users.js";
 dotenv.config();
 
 const app = express();
@@ -32,6 +34,8 @@ const startServer = async () => {
   try {
     await initDb();
     await seedPlans();
+    await seedUsers();
+    await seedSubscriptions();
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);

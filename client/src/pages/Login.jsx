@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, Loader2 } from "lucide-react";
+import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 
 import api from "../api/axios";
 import { errorToast } from "../utils/toast";
 import { useDispatch } from "react-redux";
 import { checkAuth } from "../store/actions/authActions";
+import { validateLogin } from "../utils/validation";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ const Login = () => {
   });
 
   const [loading, setLoading] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -26,6 +29,12 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const validationError = validateLogin(formData);
+
+    if (validationError) {
+      return errorToast(validationError);
+    }
 
     try {
       setLoading(true);
@@ -38,8 +47,6 @@ const Login = () => {
 
       navigate("/");
     } catch (error) {
-      console.error(error);
-
       errorToast(error?.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
@@ -47,15 +54,15 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-900 px-4">
-      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-800 p-8 shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 px-4 py-10">
+      <div className="w-full max-w-md rounded-3xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-8 shadow-2xl border border-white/30 dark:border-slate-700">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
             Welcome Back
           </h1>
 
           <p className="mt-2 text-slate-500 dark:text-slate-400">
-            Login to your account
+            Sign in to continue to your account
           </p>
         </div>
 
@@ -72,7 +79,7 @@ const Login = () => {
               />
 
               <input
-                type="email"
+                type="text"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
@@ -94,20 +101,28 @@ const Login = () => {
               />
 
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter password"
-                className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent pl-10 pr-12 py-3 outline-none transition-all duration-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900"
               />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-white hover:bg-blue-700 transition"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-3.5 font-medium text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl disabled:opacity-70"
           >
             {loading ? (
               <>

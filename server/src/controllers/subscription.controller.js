@@ -36,7 +36,8 @@ export const subscribeToPlan = async (req, res) => {
     const startDate = new Date();
 
     const endDate = new Date();
-    endDate.setMonth(endDate.getMonth() + plan.duration);
+
+    endDate.setDate(endDate.getDate() + plan.duration);
 
     const result = await pool.query(
       `INSERT INTO subscriptions
