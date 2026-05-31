@@ -1,8 +1,6 @@
 import bcryptjs from "bcryptjs";
 import pool from "../config/db.js";
-import {
-  generateToken
-} from "../utils/generateTokenAndSetCookie.js";
+import { generateToken } from "../utils/generateToken.js";
 
 export const register = async (req, res) => {
   try {
@@ -111,6 +109,93 @@ export const login = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
+    });
+  }
+};
+
+export const checkAuth = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const result = await pool.query(
+      `
+      SELECT
+        u.id,
+        u.name,
+        u.email,
+        u.role,
+
+        s.id AS subscription_id,
+        s.status,
+        s.start_date,
+        s.end_date,
+
+        p.id AS plan_id,
+        p.name AS plan_name,
+        p.price,
+        p.duration,
+        p.features
+
+      FROM users u
+
+      LEFT JOIN subscriptions s
+        ON u.id = s.user_id
+
+      LEFT JOIN plans p
+        ON s.plan_id = p.id
+
+      WHERE u.id = $1
+
+      ORDER BY s.id DESC
+      LIMIT 1
+      `,
+      [userId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const data = result.rows[0];
+
+    res.status(200).json({
+      success: true,
+
+      user: {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+      },
+
+      subscription: data.subscription_id
+        ? {
+            id: data.subscription_id,
+            status: data.status,
+            startDate: data.start_date,
+            endDate: data.end_date,
+          }
+        : null,
+
+      plan: data.plan_id
+        ? {
+            id: data.plan_id,
+            name: data.plan_name,
+            price: data.price,
+            duration: data.duration,
+            features: data.features,
+          }
+        : null,
+    });
+  } catch (error) {
+    console.error("Check Auth Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
     });
   }
 };

@@ -4,10 +4,12 @@ import { User, Mail, Lock, Loader2 } from "lucide-react";
 
 import api from "../api/axios";
 import { errorToast, successToast } from "../utils/toast";
+import { checkAuth } from "../store/actions/authActions";
+import { useDispatch } from "react-redux";
 
 const Register = () => {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -33,14 +35,17 @@ const Register = () => {
 
       successToast(response?.data?.message || "Account created successfully");
 
-      navigate("/login");
+      localStorage.setItem("token", response.data.token);
+
+      await dispatch(checkAuth());
+
+      navigate("/");
     } catch (error) {
       errorToast(error?.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-900 px-4">
       <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-800 p-8 shadow-xl">
@@ -55,8 +60,6 @@ const Register = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Name */}
-
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Name
@@ -79,8 +82,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Email */}
-
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Email
@@ -102,8 +103,6 @@ const Register = () => {
               />
             </div>
           </div>
-
-          {/* Password */}
 
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">

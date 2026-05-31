@@ -1,12 +1,28 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, User, LogOut, Sun, Moon } from "lucide-react";
+import { useSelector, useDispatch } from "react-redux";
 
 import { useTheme } from "../context/ThemeContext";
+import { logout } from "../store/slices/authSlice";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const { theme, toggleTheme } = useTheme();
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { user, subscription } = useSelector((state) => state.auth);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+
+    dispatch(logout());
+
+    navigate("/login");
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
@@ -23,26 +39,40 @@ const Header = () => {
           </div>
 
           <nav className="hidden md:flex items-center gap-8">
-            <a
-              href="/plans"
-              className="font-medium text-slate-600 hover:text-blue-600 dark:text-slate-300"
-            >
-              Plans
-            </a>
+            {user?.role === "admin" ? (
+              <>
+                <Link
+                  to="/admin/subscriptions"
+                  className="font-medium text-slate-600 hover:text-blue-600 dark:text-slate-300"
+                >
+                  Subscriptions
+                </Link>{" "}
+                <Link
+                  to="/plans"
+                  className="font-medium text-slate-600 hover:text-blue-600 dark:text-slate-300"
+                >
+                  Plans
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/plans"
+                  className="font-medium text-slate-600 hover:text-blue-600 dark:text-slate-300"
+                >
+                  Plans
+                </Link>
 
-            <a
-              href="/dashboard"
-              className="font-medium text-slate-600 hover:text-blue-600 dark:text-slate-300"
-            >
-              Dashboard
-            </a>
-
-            <a
-              href="/profile"
-              className="font-medium text-slate-600 hover:text-blue-600 dark:text-slate-300"
-            >
-              Profile
-            </a>
+                {subscription?.status === "active" && (
+                  <Link
+                    to="/dashboard"
+                    className="font-medium text-slate-600 hover:text-blue-600 dark:text-slate-300"
+                  >
+                    Dashboard
+                  </Link>
+                )}
+              </>
+            )}
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
@@ -53,13 +83,16 @@ const Header = () => {
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            <button className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2">
+            <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2">
               <User size={18} />
 
-              <span className="text-sm">Dinesh</span>
-            </button>
+              <span className="text-sm">{user?.name || "User"}</span>
+            </div>
 
-            <button className="flex items-center gap-2 rounded-xl bg-red-500 px-3 py-2 text-white">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 rounded-xl bg-red-500 px-3 py-2 text-white hover:bg-red-600 transition"
+            >
               <LogOut size={18} />
               Logout
             </button>
@@ -74,11 +107,35 @@ const Header = () => {
       {isOpen && (
         <div className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
           <div className="flex flex-col gap-4 p-4">
-            <a href="/plans">Plans</a>
+            {user?.role === "admin" ? (
+              <>
+                <Link
+                  to="/admin/subscriptions"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Subscriptions
+                </Link>
+                <Link to="/plans">Plans</Link>
+              </>
+            ) : (
+              <>
+                <Link to="/plans" onClick={() => setIsOpen(false)}>
+                  Plans
+                </Link>
 
-            <a href="/dashboard">Dashboard</a>
+                {subscription?.status === "active" && (
+                  <Link to="/dashboard" onClick={() => setIsOpen(false)}>
+                    Dashboard
+                  </Link>
+                )}
+              </>
+            )}
 
-            <a href="/profile">Profile</a>
+            <div className="flex items-center gap-2">
+              <User size={18} />
+
+              <span>{user?.name || "User"}</span>
+            </div>
 
             <button onClick={toggleTheme} className="flex items-center gap-2">
               {theme === "dark" ? (
@@ -94,7 +151,10 @@ const Header = () => {
               )}
             </button>
 
-            <button className="flex items-center gap-2 text-red-500">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-red-500"
+            >
               <LogOut size={18} />
               Logout
             </button>
