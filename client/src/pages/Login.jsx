@@ -4,6 +4,8 @@ import { Mail, Lock, Loader2 } from "lucide-react";
 
 import api from "../api/axios";
 import { errorToast } from "../utils/toast";
+import { useDispatch } from "react-redux";
+import { checkAuth } from "../store/actions/authActions";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -14,7 +16,7 @@ const Login = () => {
   });
 
   const [loading, setLoading] = useState(false);
-
+  const dispatch = useDispatch();
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -32,7 +34,9 @@ const Login = () => {
 
       localStorage.setItem("token", response.data.token);
 
-      navigate("/dashboard");
+      await dispatch(checkAuth());
+
+      navigate("/");
     } catch (error) {
       console.error(error);
 
