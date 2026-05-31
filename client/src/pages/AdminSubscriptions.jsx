@@ -28,9 +28,9 @@ const AdminSubscriptions = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
-        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-xl font-bold text-slate-900 sm:text-2xl dark:text-white">
               Subscription Management
             </h1>
 
@@ -39,24 +39,16 @@ const AdminSubscriptions = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <p className="text-xs text-slate-500">Total Subscriptions</p>
+          <div className="grid w-full grid-cols-1 gap-3 sm:w-auto">
+            <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <p className="text-xs uppercase tracking-wide text-slate-500">
+                Total Subscriptions
+              </p>
 
               {loading ? (
-                <div
-                  className="
-          mt-1
-          h-7
-          w-12
-          animate-pulse
-          rounded-md
-          bg-slate-200
-          dark:bg-slate-700
-        "
-                />
+                <div className="mt-2 h-8 w-20 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
               ) : (
-                <h3 className="text-center text-xl font-semibold text-slate-900 dark:text-white">
+                <h3 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">
                   {total}
                 </h3>
               )}
