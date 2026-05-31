@@ -11,6 +11,33 @@ export const seedSubscriptions = async () => {
       return;
     }
 
+    const values = [];
+
+    for (let i = 1; i <= 30; i++) {
+      const userId = i;
+      const planId = ((i - 1) % 3) + 1;
+
+      let status = "active";
+
+      if (i % 5 === 0) {
+        status = "expired";
+      }
+
+      if (i % 9 === 0) {
+        status = "cancelled";
+      }
+
+      values.push(`
+        (
+          ${userId},
+          ${planId},
+          NOW() - INTERVAL '${i} days',
+          NOW() + INTERVAL '${30 - i} days',
+          '${status}'
+        )
+      `);
+    }
+
     await pool.query(`
       INSERT INTO subscriptions
       (
@@ -20,91 +47,11 @@ export const seedSubscriptions = async () => {
         end_date,
         status
       )
-
       VALUES
+      ${values.join(",")}
+    `);
 
-      (
-        1,
-        1,
-        NOW() - INTERVAL '10 days',
-        NOW() + INTERVAL '20 days',
-        'active'
-      ),
-
-      (
-        2,
-        2,
-        NOW() - INTERVAL '15 days',
-        NOW() + INTERVAL '15 days',
-        'active'
-      ),
-
-      (
-        3,
-        3,
-        NOW() - INTERVAL '5 days',
-        NOW() + INTERVAL '25 days',
-        'active'
-      ),
-
-      (
-        4,
-        1,
-        NOW() - INTERVAL '40 days',
-        NOW() - INTERVAL '10 days',
-        'expired'
-      ),
-
-      (
-        5,
-        2,
-        NOW() - INTERVAL '60 days',
-        NOW() - INTERVAL '30 days',
-        'expired'
-      ),
-
-      (
-        6,
-        3,
-        NOW() - INTERVAL '20 days',
-        NOW() + INTERVAL '10 days',
-        'active'
-      ),
-
-      (
-        7,
-        1,
-        NOW() - INTERVAL '8 days',
-        NOW() + INTERVAL '22 days',
-        'active'
-      ),
-
-      (
-        8,
-        2,
-        NOW() - INTERVAL '30 days',
-        NOW(),
-        'expired'
-      ),
-
-      (
-        9,
-        3,
-        NOW() - INTERVAL '2 days',
-        NOW() + INTERVAL '28 days',
-        'active'
-      ),
-
-      (
-        10,
-        1,
-        NOW() - INTERVAL '5 days',
-        NOW() + INTERVAL '25 days',
-        'cancelled'
-      )
-      `);
-
-    console.log("Subscriptions seeded successfully");
+    console.log("30 subscriptions seeded successfully");
   } catch (error) {
     console.error("Subscription seed failed:", error);
   }

@@ -14,28 +14,33 @@ export const seedUsers = async () => {
 
     const password = await bcrypt.hash("password123", 10);
 
+    const values = [];
+
+    values.push(`('Admin', 'admin@test.com', $1, 'admin')`);
+
+    for (let i = 1; i <= 29; i++) {
+      values.push(
+        `(
+          'User ${i}',
+          'user${i}@test.com',
+          $1,
+          'user'
+        )`,
+      );
+    }
+
     await pool.query(
       `
       INSERT INTO users
       (name, email, password, role)
 
       VALUES
-
-      ('John Doe', 'john.admin@test.com', $1, 'admin'),
-      ('Jane Smith', 'jane@test.com', $1, 'user'),
-      ('Michael Brown', 'michael@test.com', $1, 'user'),
-      ('Sarah Wilson', 'sarah@test.com', $1, 'user'),
-      ('David Lee', 'david@test.com', $1, 'user'),
-      ('Emma Taylor', 'emma@test.com', $1, 'user'),
-      ('Chris Martin', 'chris@test.com', $1, 'user'),
-      ('Sophia Davis', 'sophia@test.com', $1, 'user'),
-      ('Daniel White', 'daniel@test.com', $1, 'user'),
-      ('Olivia Green', 'olivia@test.com', $1, 'user')
+      ${values.join(",")}
       `,
       [password],
     );
 
-    console.log("Users seeded successfully");
+    console.log("30 users seeded successfully");
   } catch (error) {
     console.error("User seed failed:", error);
   }
