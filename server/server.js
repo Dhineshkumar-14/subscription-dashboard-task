@@ -33,8 +33,8 @@ app.use("/api/admin", adminRoutes);
 const startServer = async () => {
   try {
     await initDb();
-    await seedPlans();
     await seedUsers();
+    await seedPlans();
     await seedSubscriptions();
 
     app.listen(PORT, () => {
